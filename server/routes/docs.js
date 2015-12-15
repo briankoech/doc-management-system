@@ -5,6 +5,7 @@
   module.exports = function(app, express) {
     var api = express.Router();
 
+    //api.use(Users.getToken);
     api.post('/document', Document.create);
     api.get('/document', Document.all);
     api.get('/document/:_id', Document.findOne);

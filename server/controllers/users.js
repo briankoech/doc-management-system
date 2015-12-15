@@ -97,6 +97,8 @@
             });
           } else {
             req.decoded = decoded;
+            // res.send(decoded);
+            console.log(decoded);
             next();
           }
         });

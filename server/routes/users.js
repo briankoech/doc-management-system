@@ -12,6 +12,8 @@
 
     api.use(Users.getToken); // Middleware to allow one to continue
 
+    //api.get('/users/token', Users.getToken);
+
     api.use('/users/:userId', Users.find); // Find a user before RUD
 
     api.get('/users', Users.all);

@@ -6,12 +6,13 @@
     create: function(req, res) {
       // get userid from the token
       var document = new Document({
-        ownerId: req.body.ownerId,
+        ownerId: req.decoded.id,
         title: req.body.title,
         content: req.body.content,
         createdAt: new Date()
       });
 
+      console.log(document);
       // save the doc
       document.save(function(err) {
         if (err) {
@@ -65,7 +66,7 @@
       // get all docs accessible to the user
       //var userId = req.param.userId;
       Document.find({
-        ownerId: req.params.id
+        ownerId: req.decoded.id
       }, function(err, documents) {
         if (err) {
           return res.status(500).send(err);
