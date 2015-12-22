@@ -30,4 +30,6 @@
     if (err) throw err;
     console.log('listening on port:' + config.port);
   });
+
+  module.exports = app;
 })();

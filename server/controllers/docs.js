@@ -1,6 +1,7 @@
 (function() {
   'use strict';
-  var Document = require('../models/document');
+  var Document = require('../models/document'),
+    Role = require('../models/role');
 
   module.exports = {
     create: function(req, res) {
@@ -14,18 +15,36 @@
 
       console.log(document);
       // save the doc
-      document.save(function(err) {
+      document.save(function(err, doc) {
         if (err) {
           res.status(500).send("err", err);
         } else {
-          res.status(201).send({
-            message: "doc created successfuly"
+
+          var role = new Role({
+            userId: req.decoded.id,
+            docId: doc._id,
+            role: 'owner'
+          });
+
+          role.save(function(err, role) {
+            if (err) {
+              res.status(500).send({
+                err
+              });
+            } else {
+              console.log();
+              res.status(201).send({
+                message: 'Document and role added successfuly',
+                doc: doc,
+                role: role
+              });
+            }
           });
         }
       });
     },
 
-    all: function(req, res) {
+    getAllDocuments: function(req, res) {
       Document.find(function(err, documents) {
         if (err) {
           res.status(500).send(err);

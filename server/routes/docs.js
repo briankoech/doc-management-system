@@ -7,7 +7,7 @@
 
     //api.use(Users.getToken);
     api.post('/document', Document.create);
-    api.get('/document', Document.all);
+    api.get('/document', Document.getAllDocuments);
     api.get('/document/:_id', Document.findOne);
     // .get(function(req, res) {
     //  res.send(req.body);
