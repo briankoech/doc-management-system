@@ -3,7 +3,6 @@
   var Users = require('../controllers/users');
 
   module.exports = function(app, express) {
-    console.log('I am in');
     var api = express.Router();
 
     api.post('/users', Users.create); // close sign-up
@@ -14,7 +13,7 @@
 
     api.get('/users/token', Users.getToken);
 
-   api.use('/users/:userId', Users.find); // Find a user before RUD
+    api.use('/users/:userId', Users.find); // Find a user before RUD
 
     api.get('/users', Users.all);
 

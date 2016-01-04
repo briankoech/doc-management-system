@@ -4,6 +4,7 @@
   var bcrypt = require('bcrypt-nodejs');
   var Schema = mongoose.Schema;
   require('./document');
+  require('./role');
 
   var UserSchema = new Schema({
     username: {
@@ -30,6 +31,10 @@
         },
         message: '{VALUE} is not a valid email address'
       }
+    },
+    role: {
+      type: Schema.Types.ObjectId,
+      ref: 'Role'
     },
     password: {
       type: String,

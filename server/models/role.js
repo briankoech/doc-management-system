@@ -1,14 +1,19 @@
 (function() {
-	'use strict';
+  'use strict';
 
-	var mongoose = require('mongoose');
-	var Schema = mongoose.Schema;
+  var mongoose = require('mongoose');
+  var Schema = mongoose.Schema;
 
-	var RoleSchema = new Schema({
-		userId: {type: Schema.Types.ObjectId, ref: 'User', required: true},
-		docId: {type: Schema.Types.ObjectId, ref: 'Document', required: true},
-		role: {type: String, enum: ['owner', 'admin', 'contributor']}
-	});
+  var RoleSchema = new Schema({
+    title: {
+      type: String,
+      require: true,
+      index: {
+        unique: true
+      },
+      enum: ['admin', 'contributor', 'data_reader']
+    }
+  });
 
-	module.exports = mongoose.model('Role', RoleSchema);
+  module.exports = mongoose.model('Role', RoleSchema);
 })();

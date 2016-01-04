@@ -2,6 +2,7 @@
   'use strict';
 
   var User = require('../models/user'),
+    Role = require('../models/role'),
     config = require('../config/config'),
     jwt = require('jsonwebtoken'),
     secretKey = config.secretKey;
@@ -20,28 +21,46 @@
 
   module.exports = {
     create: function(req, res) {
-      // create a new user
-      console.log('i av been invoked');
-      var user = new User({
-        username: req.body.username,
-        name: {
-          first: req.body.firstname,
-          last: req.body.lastname
-        },
-        email: req.body.email,
-        password: req.body.password,
-        createdAt: new Date()
-      });
-
-      //save the user
-      user.save(function(err) {
+      // get the roleid from
+      Role.findOne({
+        'title': req.body.role
+      }, function(err, role) {
         if (err) {
-          res.send(err);
-          return;
+          res.status(500).send({
+            erro: err
+          });
+        } else if (role) {
+          // create a new user
+          var user = new User({
+            username: req.body.username,
+            name: {
+              first: req.body.firstname,
+              last: req.body.lastname
+            },
+            email: req.body.email,
+            role: role._id,
+            password: req.body.password,
+            createdAt: new Date()
+          });
+
+          //save the user
+          user.save(function(err, user) {
+            if (err) {
+              res.status(500).send({
+                error: err.errmsg
+              });
+              return;
+            }
+            res.status(201).send({
+              message: 'User created Successfully',
+              user: user
+            });
+          });
+        } else {
+          res.status(500).send({
+            error: 'No such role defined'
+          });
         }
-        res.json({
-          message: "User created Successfully"
-        });
       });
     },
 
@@ -55,21 +74,21 @@
         // if no user is found
         if (!user) {
           res.send({
-            message: "No such user exists"
+            message: 'No such user exists'
           });
         } else if (user) {
           // validate the password
           var validePassword = user.comparePassword(req.body.password);
           if (!validePassword) {
             res.send({
-              message: "Invalid password"
+              message: 'Invalid password'
             });
           } else {
             // user is valid. create a token to save user
             var token = createToken(user);
             res.json({
               success: true,
-              message: "login success",
+              message: 'login success',
               token: token
             });
           }
@@ -93,19 +112,18 @@
           if (err) {
             res.status(403).send({
               success: false,
-              message: "Failed to authnticate user"
+              message: 'Failed to authnticate user'
             });
           } else {
             req.decoded = decoded;
             // res.send(decoded);
-            console.log(decoded);
             next();
           }
         });
       } else {
         res.status(403).send({
           success: false,
-          message: "No token provided"
+          message: 'No token provided'
         });
       }
     },
@@ -119,7 +137,7 @@
           next();
         } else {
           res.send({
-            message: "No such user!"
+            message: 'No such user!'
           });
         }
       });
