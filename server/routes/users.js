@@ -13,9 +13,9 @@
 
     api.get('/users/token', Users.getToken);
 
-    api.use('/users/:userId', Users.find); // Find a user before RUD
+    api.get('/users/:userId', Users.find); // Find a user before RUD
 
-    api.get('/users', Users.all);
+    api.get('/users', Users.getAllUsers);
 
     api.route('/users/:userId')
       .get(Users.findOne)

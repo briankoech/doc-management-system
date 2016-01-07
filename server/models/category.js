@@ -4,16 +4,15 @@
   var mongoose = require('mongoose');
   var Schema = mongoose.Schema;
 
-  var RoleSchema = new Schema({
-    title: {
+  var CategorySchema = new Schema({
+    category: {
       type: String,
-      require: true,
+      required: true,
       index: {
         unique: true
-      },
-      enum: ['admin', 'contributor', 'viewer']
+      }
     }
   });
 
-  module.exports = mongoose.model('Role', RoleSchema);
+  module.exports = mongoose.model('Category', CategorySchema);
 })();

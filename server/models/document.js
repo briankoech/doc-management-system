@@ -22,6 +22,12 @@
       required: true
     },
 
+    category: {
+      type: Schema.Types.ObjectId,
+      ref: 'Category',
+      required: true
+    },
+
     content: {
       type: String,
       required: true

@@ -28,6 +28,8 @@
     "jsonwebtoken": "^5.4.1",
     "kerberos": "0.0.17",
     "mongoose": "^4.2.9",
+    "mongoose-seed": "^0.1.5",
+    "mongoose-seeder": "^1.2.1",
     "morgan": "^1.6.1",
     "nodemon": "^1.8.1",
     "npm-test": "0.0.1",

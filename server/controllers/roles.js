@@ -5,7 +5,7 @@
   module.exports = {
     create: function(req, res) {
       var role = new Roles({
-        title: req.body.role
+        title: req.body.title
       });
 
       role.save(function(err, role) {
@@ -23,6 +23,10 @@
       Roles.find({}, function(err, roles) {
         if (err) {
           res.status(500).send(err);
+        } else if (!roles) {
+          res.status(500).send({
+            error: 'no roles found'
+          });
         } else {
           res.status(200).send(roles);
         }

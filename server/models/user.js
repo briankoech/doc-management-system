@@ -16,10 +16,12 @@
     },
     name: {
       first: {
-        type: String
+        type: String,
+        require: true
       },
       last: {
-        type: String
+        type: String,
+        require: true
       }
     },
     email: {

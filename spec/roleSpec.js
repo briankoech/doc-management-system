@@ -9,13 +9,13 @@
       request(app)
         .post('/api/roles')
         .send({
-          title: 'admin'
+          title: 'viewer'
         })
         .set('Accept', 'application/json')
         .end(function(err, res) {
           expect(err).toBeNull();
           expect(res.body).toBeDefined();
-          expect(res.body).toBe('admin');
+          expect(res.body.title).toBe('viewer');
           done();
         });
     });
@@ -28,8 +28,10 @@
         })
         .set('Accept', 'application/json')
         .end(function(err, res) {
+          console.log(res.body);
           expect(err).toBeNull();
           expect(res.body.error).toBeDefined();
+          expect(res.body.error).toContain('duplicate key error');
           done();
         });
     });
@@ -39,8 +41,11 @@
         .get('/api/roles')
         .set('Accept', 'application/json')
         .end(function(err, res) {
+          console.log(res.body);
           expect(err).toBeNull();
-          expect(res).toBeDefined();
+          expect(res.body).toBeDefined();
+          expect(Array.isArray(res.body)).toBe(true);
+          expect(res.body.length).toEqual(3);
           done();
         });
     });

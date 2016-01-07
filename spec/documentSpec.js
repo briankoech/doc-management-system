@@ -3,13 +3,19 @@
 
   var request = require('supertest');
   var app = require('../server');
-  var token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjU2NjE5NzU2NDdjNDg1MWIwZjRiZDVlZiIsIm5hbWUiOnt9LCJpYXQiOjE0NTA2OTY3MTl9.uqxRNa-P5MJRidxChJXoGKoWOSVrdX6UKkADhFncQpk';
+  var helper = require('./login-helper.js');
 
   describe('15. Documents', function() {
+    var token;
 
-    beforeEach(function() {
-      request(app)
-        .set('x-access-token', token);
+    beforeAll(function(done) {
+      helper.create(app, function() {
+        helper.login(app, 'mark', 'abc123', function(tokn) {
+          token = tokn;
+          console.log(token);
+          done();
+        });
+      });
     });
 
     it('16. Doc created has a published date', function(done) {
@@ -18,13 +24,15 @@
         .send({
           ownerId: 2,
           title: 'Welcome to Andela',
+          category: 'Music',
           content: 'This is Andela',
           createdAt: new Date()
         })
         .set('Accept', 'application/json')
         .set('x-access-token', token)
         .end(function(err, res) {
-          // console.log(res.body);
+          console.log("DATTTTATATTA");
+          console.log(err);
           expect(err).toBeNull();
           expect(res.body).toBeDefined();
           expect(res.body.message).toBe('Document and role added successfuly');

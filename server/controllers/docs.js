@@ -1,57 +1,98 @@
 (function() {
   'use strict';
   var Document = require('../models/document'),
-    Role = require('../models/role');
+    Role = require('../models/role'),
+    Category = require('../models/category'),
+    users = require('./users');
+
 
   module.exports = {
     create: function(req, res) {
+
+      var docsave = function(categoryId) {
+        var document = new Document({
+          ownerId: req.decoded._id,
+          title: req.body.title,
+          category: categoryId,
+          content: req.body.content,
+          createdAt: new Date()
+        });
+
+        document.save(function(err, doc) {
+          if (err) {
+            res.status(500).send({
+              error: err.message,
+              errr: 'this one'
+            });
+          } else {
+            res.status(201).send({
+              message: 'Document created successfuly',
+              doc: doc.title
+            });
+          }
+        });
+      };
       // get userid from the token
-      var document = new Document({
-        ownerId: req.decoded.id,
-        title: req.body.title,
-        content: req.body.content,
-        createdAt: new Date()
-      });
-
-      console.log(document);
-      // save the doc
-      document.save(function(err, doc) {
+      Role.findById(req.decoded.role, function(err, role) {
         if (err) {
-          res.status(500).send("err", err);
+          res.status(500).send({
+            error: err
+          });
+        } else if (!role) {
+          res.status(404).send({
+            error: 'no such role found',
+            role: req.decoded.role
+          });
         } else {
+          if (role.title === 'viewer') {
+            res.status(401).send({
+              error: 'You are not authorised to create document'
+            });
+          } else {
+            // check if category exists
+            Category.findOne({
+              'category': req.body.category
+            }, function(err, category) {
+              if (err) {
+                res.status(500).send({
+                  error: 'Server error. Couldn\'t confirm category'
+                });
+              } else if (!category) {
+                var category = new Category({
+                  category: req.body.category
+                });
 
-          var role = new Role({
-            userId: req.decoded.id,
-            docId: doc._id,
-            role: 'owner'
-          });
-
-          role.save(function(err, role) {
-            if (err) {
-              res.status(500).send({
-                err
-              });
-            } else {
-              console.log();
-              res.status(201).send({
-                message: 'Document and role added successfuly',
-                doc: doc,
-                role: role
-              });
-            }
-          });
+                category.save(function(err, category) {
+                  if (err) {
+                    res.status(500).send({
+                      error: err,
+                      err: 'another one'
+                    });
+                  } else {
+                    // go to doc saving
+                    docsave(category._id);
+                  }
+                });
+              } else {
+                // go to doc saving
+                docsave(category._id);
+              }
+            });
+          }
         }
       });
     },
 
     getAllDocuments: function(req, res) {
-      Document.find(function(err, documents) {
-        if (err) {
-          res.status(500).send(err);
-        } else {
-          res.json(documents);
-        }
-      });
+      Document.find({})
+        .limit(10)
+        .exec(function(err, documents) {
+          if (err) {
+            res.status(500).send(err);
+          } else {
+            res.json(documents);
+          }
+        });
     },
 
     findOne: function(req, res) {
