@@ -52,30 +52,33 @@
             // check if category exists
             Category.findOne({
               'category': req.body.category
-            }, function(err, category) {
+            }, function(err, result) {
+              console.log(result);
               if (err) {
                 res.status(500).send({
                   error: 'Server error. Couldn\'t confirm category'
                 });
-              } else if (!category) {
+              } else if (!result) {
                 var category = new Category({
                   category: req.body.category
                 });
 
-                category.save(function(err, category) {
+                category.save(function(err, cat) {
                   if (err) {
+                    console.log(cat);
                     res.status(500).send({
                       error: err,
-                      err: 'another one'
+                      err: 'another new one',
+                      cat: cat
                     });
                   } else {
                     // go to doc saving
-                    docsave(category._id);
+                    docsave(cat._id);
                   }
                 });
               } else {
                 // go to doc saving
-                docsave(category._id);
+                docsave(result._id);
               }
             });
           }

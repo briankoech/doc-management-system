@@ -8,9 +8,7 @@
     category: {
       type: String,
       required: true,
-      index: {
-        unique: true
-      }
+      unique: true
     }
   });
 

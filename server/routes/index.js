@@ -6,6 +6,7 @@
     require('./users')(app, express);
     require('./roles')(app, express);
     require('./docs')(app, express);
+    require('./category')(app, express);
 
     // home route
     app.get('/*', function(req, res) {

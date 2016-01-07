@@ -7,7 +7,7 @@
   var RoleSchema = new Schema({
     title: {
       type: String,
-      require: true,
+      required: true,
       index: {
         unique: true
       },
