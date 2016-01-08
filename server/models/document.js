@@ -11,6 +11,12 @@
       required: true
     },
 
+    accessLevel: {
+      type: Number,
+      enum: [1, 2, 3],
+      default: 1
+    },
+
     editors: [{
       type: Schema.Types.ObjectId,
       ref: 'User',

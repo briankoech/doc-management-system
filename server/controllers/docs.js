@@ -8,10 +8,10 @@
 
   module.exports = {
     create: function(req, res) {
-
       var docsave = function(categoryId) {
         var document = new Document({
           ownerId: req.decoded._id,
+          accessLevel: req.body.accessLevel,
           title: req.body.title,
           category: categoryId,
           content: req.body.content,
@@ -21,13 +21,12 @@
         document.save(function(err, doc) {
           if (err) {
             res.status(500).send({
-              error: err.message,
-              errr: 'this one'
+              error: err
             });
           } else {
             res.status(201).send({
               message: 'Document created successfuly',
-              doc: doc.title
+              doc: doc
             });
           }
         });
@@ -51,7 +50,7 @@
           } else {
             // check if category exists
             Category.findOne({
-              'category': req.body.category
+              'category': req.body.category.toLowerCase()
             }, function(err, result) {
               console.log(result);
               if (err) {
@@ -60,7 +59,7 @@
                 });
               } else if (!result) {
                 var category = new Category({
-                  category: req.body.category
+                  category: req.body.category.toLowerCase()
                 });
 
                 category.save(function(err, cat) {
@@ -68,8 +67,7 @@
                     console.log(cat);
                     res.status(500).send({
                       error: err,
-                      err: 'another new one',
-                      cat: cat
+                      err: 'another new one'
                     });
                   } else {
                     // go to doc saving
@@ -89,13 +87,63 @@
     getAllDocuments: function(req, res) {
       Document.find({})
         .limit(10)
+        .sort({
+          'createdAt': -1
+        })
         .exec(function(err, documents) {
           if (err) {
             res.status(500).send(err);
+          } else if (!documents) {
+            res.status(404).send({
+              error: 'No documents found'
+            });
           } else {
-            res.json(documents);
+            res.status(200).send(documents);
           }
         });
+    },
+
+    getAllDocumentsByRole: function(req, res) {
+      // get the user role from req.decoded
+      // get docs by accessLevel specified
+      var level;
+      if (req.decoded.role === 'admin') {
+        bri({
+          $gte: 1
+        });
+        // level = 1;
+      } else if (req.decoded.role === 'contributor') {
+        bri({
+          $gte: 2
+        });
+      } else {
+        bri({
+          $gte: 3
+        });
+      }
+      var bri = function(level) {
+        Document.findAll({
+            where: {
+              accessLevel: level
+            }
+          })
+          .limit(10)
+          .sort({
+            'createdAt': -1
+          })
+          .exec(function(err, documents) {
+            if (err) {
+              res.status(500).send(err);
+            } else if (documents) {
+              res.status(200).send(documents);
+            } else {
+              res.status(404).send({
+                error: 'No documents found'
+              });
+            }
+          });
+      };
+
     },
 
     findOne: function(req, res) {

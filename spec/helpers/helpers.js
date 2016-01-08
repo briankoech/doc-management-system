@@ -25,11 +25,12 @@
     // Load models
     seeder.loadModels(['./server/models/document.js',
       './server/models/role.js',
-      './server/models/user.js'
+      './server/models/user.js',
+      './server/models/category.js'
     ]);
 
     // clear the specified models
-    seeder.clearModels(['Document', 'Role', 'User'], function() {
+    seeder.clearModels(['Document', 'Role', 'User', 'Category'], function() {
       seeder.populateModels(data);
     });
   });
