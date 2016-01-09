@@ -1,4 +1,6 @@
 (function() {
+  'use strict';
+
   var Roles = require('../controllers/roles');
 
   module.exports = function(app, express) {
