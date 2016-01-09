@@ -106,23 +106,22 @@
     getAllDocumentsByRole: function(req, res) {
       // get the user role from req.decoded
       // get docs by accessLevel specified
-      var level;
-      if (req.decoded.role === 'admin') {
-        bri({
-          $gte: 1
+      var getRole = function(roleId) {
+        // get the roleId from req.decoded
+        Role.findById(roleId, function(err, role) {
+          if (err) {
+            return 'error';
+          } else if (role) {
+            console.log('Role found', role.title);
+            return role.title;
+          } else {
+            return 'no such role';
+          }
         });
-        // level = 1;
-      } else if (req.decoded.role === 'contributor') {
-        bri({
-          $gte: 2
-        });
-      } else {
-        bri({
-          $gte: 3
-        });
-      }
-      var bri = function(level) {
-        Document.findAll({
+      };
+
+      var findDocs = function(level) {
+        Document.find({
             where: {
               accessLevel: level
             }
@@ -144,6 +143,23 @@
           });
       };
 
+      if (getRole(req.decoded.role) === 'admin') {
+        console.log('THIS RAN', getRole(req.decoded.role));
+        findDocs({
+          $gte: 1
+        });
+        // level = 1;
+      } else if (getRole(req.decoded.role) === 'contributor') {
+        console.log(getRole('NOT THS', req.decoded.role));
+        findDocs({
+          $gte: 2
+        });
+      } else {
+        console.log(getRole('OH MY', req.decoded.role));
+        findDocs({
+          $gte: 3
+        });
+      }
     },
 
     findOne: function(req, res) {
