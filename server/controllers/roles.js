@@ -19,6 +19,19 @@
       });
     },
 
+    getRole: function(req) {
+      // get the roleId from req.decoded
+      Roles.findById(req.decoded.role, function(err, role) {
+        if (err) {
+          return 'error';
+        } else if (role) {
+          return role.title;
+        } else {
+          return 'no such role';
+        }
+      });
+    },
+
     getAllRoles: function(req, res) {
       Roles.find({}, function(err, roles) {
         if (err) {
