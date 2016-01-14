@@ -17,7 +17,7 @@
       default: 1
     },
 
-    editors: [{
+    contributors: [{
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: false

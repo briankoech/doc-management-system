@@ -9,14 +9,10 @@
     api.post('/document', Document.create);
     api.get('/document', Document.getAllDocuments);
     api.get('/documentbyrole', Document.getAllDocumentsByRole);
+    api.get('/documentbydate', Document.getAllDocumentsByDate);
+    api.get('/documentbycategory/:category', Document.getDocumenstByCategory);
     api.get('/document/:_id', Document.findOne);
-    // .get(function(req, res) {
-    //  res.send(req.body);
-    // })
-    api.put('document/:_id', Document.update);
-    // .delete('/:_id', function(req, res) {
-
-    // });
+    api.put('/document/:_id', Document.update);
 
     api.get('/users/:userId/documents', Document.getAllById);
 

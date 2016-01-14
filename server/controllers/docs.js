@@ -52,7 +52,6 @@
             Category.findOne({
               'category': req.body.category.toLowerCase()
             }, function(err, result) {
-              console.log(result);
               if (err) {
                 res.status(500).send({
                   error: 'Server error. Couldn\'t confirm category'
@@ -64,7 +63,6 @@
 
                 category.save(function(err, cat) {
                   if (err) {
-                    console.log(cat);
                     res.status(500).send({
                       error: err,
                       err: 'another new one'
@@ -104,26 +102,30 @@
     },
 
     getAllDocumentsByRole: function(req, res) {
-      // get the user role from req.decoded
-      // get docs by accessLevel specified
-      var getRole = function(roleId) {
-        // get the roleId from req.decoded
-        Role.findById(roleId, function(err, role) {
-          if (err) {
-            return 'error';
-          } else if (role) {
-            console.log('Role found', role.title);
-            return role.title;
+      Role.findById(req.decoded.role, function(err, role) {
+        if (err) {
+          res.status(500).send({
+            error: err
+          });
+        } else if (role) {
+          if (role.title === 'admin') {
+            findDocs(1);
+          } else if (role.title === 'contributor') {
+            findDocs(2);
           } else {
-            return 'no such role';
+            findDocs(3);
           }
-        });
-      };
+        } else {
+          res.status(404).send({
+            message: 'No such role'
+          });
+        }
+      });
 
       var findDocs = function(level) {
         Document.find({
-            where: {
-              accessLevel: level
+            accessLevel: {
+              $gte: level
             }
           })
           .limit(10)
@@ -133,65 +135,116 @@
           .exec(function(err, documents) {
             if (err) {
               res.status(500).send(err);
+            } else if (documents.length === 0) {
+              res.status(404).send({
+                message: 'No documents found'
+              });
             } else if (documents) {
               res.status(200).send(documents);
-            } else {
-              res.status(404).send({
-                error: 'No documents found'
-              });
             }
           });
       };
+    },
 
-      if (getRole(req.decoded.role) === 'admin') {
-        console.log('THIS RAN', getRole(req.decoded.role));
-        findDocs({
-          $gte: 1
-        });
-        // level = 1;
-      } else if (getRole(req.decoded.role) === 'contributor') {
-        console.log(getRole('NOT THS', req.decoded.role));
-        findDocs({
-          $gte: 2
-        });
-      } else {
-        console.log(getRole('OH MY', req.decoded.role));
-        findDocs({
-          $gte: 3
-        });
-      }
+    getAllDocumentsByDate: function(req, res) {
+      Document.find({
+        'createdAt': {
+          $gte: new Date(req.query.from),
+          $lt: new Date(req.query.to) || new Date()
+        }
+      }, function(err, documents) {
+        if (err) {
+          res.status(500).send({
+            error: err
+          });
+        } else if (documents.length < 1) {
+          res.status(404).send({
+            message: 'No doc found'
+          });
+        } else {
+          res.status(200).send(documents);
+        }
+      });
+    },
+
+    getDocumenstByCategory: function(req, res) {
+      // find the categoryId
+      Category.find({
+        category: req.params.category.toLowerCase
+      }, function(err, category) {
+        if (err) {
+          res.status(500).send({
+            error: err
+          });
+        } else {
+          // get the categoryId
+          Document.find({
+            category: category._id
+          }, function(err, documents) {
+            if (err) {
+              res.status(500).send({
+                error: err
+              });
+            } else {
+              res.status(200).send(documents);
+            }
+          });
+        }
+      });
+    },
+    addEditors: function(req, res) {
+      // get the contributorsId check if it exists
     },
 
     findOne: function(req, res) {
-      console.log("THis has been called");
       Document.findById(req.params._id, function(err, document) {
         if (err) {
-          console.log("Sjitnkjns");
           res.status(500).send(err);
         } else if (document) {
-          console.log("Sjitnkjns");
           res.status(200).send(document);
         } else {
           res.status(500).send({
-            message: "document isnt available"
+            message: 'document isnt available'
           });
         }
       });
     },
 
     update: function(req, res) {
-      req.document.ownerId = req.body.ownerId;
-      req.document.title = req.body.title;
-      req.document.content = req.body.content;
-      req.document.updatedAt = req.body.updatedAt;
-      req.document.save();
-      res.send(req.document);
+      Role.findById(req.decoded.role, function(err, role) {
+        if (err) {
+          res.status(500).send({
+            error: err
+          });
+        } else {
+          Document.findById(req.params._id, function(err, doc) {
+            if (err) {
+              res.status(500).send({
+                error: err
+              });
+            } else {
+              if (role.title === 'admin' || req.decoded._id === doc.ownerId || doc.contributors.indexOf(req.decoded._id) >= 0) {
+                req.document = doc;
+                doc.title = req.body.title;
+                doc.content = req.body.content;
+                doc.save(function(err, rs) {
+                  (err) ? res.status(500).send({
+                    error: err
+                  }): res.status(200).send(rs);
+                });
+              } else {
+                res.status(401).send({
+                  message: 'You are not allowed to edit this doc'
+                });
+              }
+            }
+          });
+        }
+      });
     },
 
     getAllById: function(req, res) {
       // get the user id
-      // get all docs accessible to the user
-      //var userId = req.param.userId;
       Document.find({
         ownerId: req.decoded.id
       }, function(err, documents) {
@@ -201,7 +254,7 @@
           return res.status(200).send(documents);
         } else {
           return res.send({
-            message: "No documents found"
+            message: 'No documents found'
           });
         }
       });

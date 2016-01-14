@@ -100,6 +100,7 @@
       });
     },
 
+    // middlewarre to check user auth
     getToken: function(req, res, next) {
       var token = req.headers['x-access-token'];
 
