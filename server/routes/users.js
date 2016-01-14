@@ -17,10 +17,9 @@
 
     api.get('/users', Users.getAllUsers);
 
-    api.route('/users/:userId')
-      .get(Users.findOne)
-      .put(Users.update)
-      .delete(Users.delete);
+    api.put('/users/:userId', Users.update);
+    api.delete('/users/:userId', Users.delete);
+    api.post('/users/logout', Users.logout);
 
     app.use('/api', api);
   };

@@ -192,7 +192,7 @@
         }
       });
     },
-    addEditors: function(req, res) {
+    addContributors: function(req, res) {
       // get the contributorsId check if it exists
     },
 
@@ -203,7 +203,7 @@
         } else if (document) {
           res.status(200).send(document);
         } else {
-          res.status(500).send({
+          res.status(404).send({
             message: 'document isnt available'
           });
         }
@@ -211,6 +211,7 @@
     },
 
     update: function(req, res) {
+      // update if you are admin, owner or contributor
       Role.findById(req.decoded.role, function(err, role) {
         if (err) {
           res.status(500).send({
@@ -227,10 +228,10 @@
                 req.document = doc;
                 doc.title = req.body.title;
                 doc.content = req.body.content;
-                doc.save(function(err, rs) {
+                doc.save(function(err, result) {
                   (err) ? res.status(500).send({
                     error: err
-                  }): res.status(200).send(rs);
+                  }): res.status(200).send(result);
                 });
               } else {
                 res.status(401).send({
@@ -258,8 +259,47 @@
           });
         }
       });
+    },
 
+    delete: function(req, res) {
+      // delete if you are the owner or admin
+      Role.findById(req.decoded.role, function(err, role) {
+        if (err) {
+          res.status(500).send({
+            error: err
+          });
+        } else {
+          Document.findById(req.params._id, function(err, doc) {
+            if (err) {
+              res.status(500).send({
+                error: err
+              });
+            } else if (doc) {
+              if (role.title === 'admin' || req.decoded._id === doc.ownerId) {
+                Document.remove({
+                  _id: req.params._id
+                }, function(err) {
+                  err ? res.status(500).send({
+                    error: err
+                  }) : res.status(200).send({
+                    message: 'delete successfuly'
+                  });
+                });
+              } else {
+                res.status(401).send({
+                  message: 'You are not allowed to delete this doc'
+                });
+              }
+            } else {
+              res.status(404).send({
+                message: 'Document not found'
+              });
+            }
+          });
+        }
+      });
     }
+
   };
 
 })();

@@ -3,7 +3,6 @@
   var mongoose = require('mongoose');
   var bcrypt = require('bcrypt-nodejs');
   var Schema = mongoose.Schema;
-  require('./document');
   require('./role');
 
   var UserSchema = new Schema({
@@ -50,10 +49,10 @@
       type: Date,
       default: Date.now
     },
-    documents: [{
-      type: Schema.Types.ObjectId,
-      ref: 'Document'
-    }]
+    loggedIn: {
+      type: Boolean,
+      Default: false
+    }
   });
 
   // Hash the password before save

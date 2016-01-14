@@ -81,12 +81,30 @@
             });
           } else {
             // user is valid. create a token to save user
-            user.password = null;
-            var token = createToken(user);
-            res.json({
-              success: true,
-              message: 'login success',
-              token: token
+            // update the loggedIn column to true
+            User.findOneAndUpdate({
+              username: user.username
+            }, {
+              $set: {
+                loggedIn: true
+              }
+            }, {
+              new: true
+            }, function(err, result) {
+              if (err) {
+                res.status(500).send({
+                  error: err
+                });
+              } else {
+                result.password = null;
+                var token = createToken(result);
+                res.json({
+                  success: true,
+                  message: 'login success',
+                  token: token,
+                  user: result
+                });
+              }
             });
           }
         }
@@ -103,19 +121,29 @@
     // middlewarre to check user auth
     getToken: function(req, res, next) {
       var token = req.headers['x-access-token'];
-
+      var errormsg = {
+        success: false,
+        message: 'Failed to authenticate user'
+      };
       // check if token exists
       if (token) {
         jwt.verify(token, secretKey, function(err, decoded) {
           if (err) {
-            res.status(403).send({
-              success: false,
-              message: 'Failed to authenticate user'
-            });
+            res.status(403).send();
           } else {
+            // check if loggedIn is true
             req.decoded = decoded;
-            // res.send(decoded);
-            next();
+            User.findById(req.decoded._id, function(err, user) {
+              if (err) {
+                res.status(403).send(errormsg);
+              } else {
+                if (user.loggedIn) {
+                  next();
+                } else {
+                  res.status(403).send(errormsg);
+                }
+              }
+            });
           }
         });
       } else {
@@ -139,6 +167,7 @@
           next();
         } else {
           res.status(200).send(user);
+          next();
         }
 
       });
@@ -150,22 +179,122 @@
 
     update: function(req, res) {
       // check if user is admin | self
-      req.user.username = req.body.user;
-      req.user.firstname = req.body.firstname;
-      req.user.lastname = req.body.lastname;
-      req.user.email = req.body.email;
-      req.user.updatedAt = req.body.updatedAt;
-      req.user.save();
-      res.json(req.user);
+      Role.findById(req.decoded.role, function(err, role) {
+        if (err) {
+          res.status(500).send({
+            error: err
+          });
+        } else {
+          User.findById(req.params.userId, function(err, user) {
+            if (err) {
+              res.status(500).send({
+                error: err
+              });
+            } else if (!user) {
+              res.status(404).send({
+                message: 'no such user'
+              });
+            } else {
+              if (role.title === 'admin' || req.decoded.id === user._id) {
+                //user.password = null;
+                req.user = user;
+                req.user.name.first = req.body.firstname;
+                req.user.name.last = req.body.lastname;
+                req.user.email = req.body.email;
+                user.save(function(err, result) {
+                  if (err) {
+                    res.status(500).send({
+                      error: err,
+                      user: user
+                    });
+                  } else {
+                    res.status(200).send({
+                      message: 'update successful',
+                      user: result
+                    });
+                  }
+
+                });
+
+              } else {
+                res.status(401).send({
+                  message: 'You are not allowed to delete this user'
+                });
+              }
+            }
+          });
+
+        }
+      });
     },
 
     delete: function(req, res) {
-      // check if user is admin || self
-      res.body.remover(function(err) {
+      // check if user is admin | self
+      Role.findById(req.decoded.role, function(err, role) {
         if (err) {
-          res.status(500).send(err);
+          res.status(500).send({
+            error: err
+          });
         } else {
-          res.status(204).send('User deleted!');
+          User.findById(req.params.userId, function(err, user) {
+            if (err) {
+              res.status(500).send({
+                error: err
+              });
+            } else if (!user) {
+              res.status(404).send({
+                message: 'no such user'
+              });
+            } else {
+              if (role.title === 'admin' || req.decoded.id === user._id) {
+                User.remove({
+                  _id: req.params.userId
+                }, function(err) {
+                  if (err) {
+                    res.status(500).send({
+                      error: err
+                    });
+                  } else {
+                    res.status(200).send({
+                      message: 'delete successful'
+                    });
+                  }
+                });
+              } else {
+                res.status(401).send({
+                  message: 'You are not allowed to delete this user'
+                });
+              }
+            }
+          });
+
+        }
+      });
+    },
+
+    logout: function(req, res) {
+      req.headers['x-access-token'] = null;
+
+      User.findOneAndUpdate({
+        _id: req.decoded._id
+      }, {
+        $set: {
+          loggedIn: false
+        }
+      }, {
+        new: true
+      }, function(err, result) {
+        if (err) {
+          res.status(404).send({
+            error: req.decoded,
+            err: err,
+            rs: result
+          });
+        } else {
+          res.status(200).send({
+            success: true,
+            message: 'You are now logged out'
+          });
         }
       });
     }
