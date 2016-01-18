@@ -192,6 +192,7 @@
         }
       });
     },
+
     addContributors: function(req, res) {
       // get the contributorsId check if it exists
     },

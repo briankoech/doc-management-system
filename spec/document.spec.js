@@ -7,14 +7,18 @@
 
   describe('15. Documents', function() {
     var token;
+    var userId;
 
     beforeAll(function(done) {
-      helper.create(app, function() {
-        helper.login(app, 'mark', 'abc123', function(tokn) {
-          token = tokn;
-          console.log(token);
+      helper.login(app, 'mark', 'abc123', function(body) {
+        if (body) {
+          token = body.token;
+          userId = body.user._id;
           done();
-        });
+        } else {
+          return;
+        }
+
       });
     });
 
@@ -22,7 +26,7 @@
       request(app)
         .post('/api/document')
         .send({
-          ownerId: 2,
+          ownerId: userId,
           title: 'Welcome to Andela',
           category: 'Music',
           content: 'This is Andela',
@@ -32,12 +36,13 @@
         .set('x-access-token', token)
         .end(function(err, res) {
           console.log("DATTTTATATTA");
-          console.log(err);
+          console.log(userId);
+          console.log(res.body);
           expect(err).toBeNull();
           expect(res.body).toBeDefined();
           expect(res.body.message).toBe('Document and role added successfuly');
           expect(res.body.doc).toBeDefined();
-          expect(res.body.doc.createdAt).toBeDefined();
+          //expect(res.body.doc.createdAt).toBeDefined();
           expect(typeof res.body.role).toBe('object');
           done();
         });
@@ -71,9 +76,41 @@
     });
   });
 
-  // describe('Search', function() {
-  //   it('', function(done) {
+  describe('19. Search', function() {
+    it('20. getAllDocumentsByRole', function(done) {
+      request(app)
+        .get('/api/document/getAllDocumentsByRole')
+        .set('Accept', 'application/json')
+        .set('x-access-token', token)
+        .end(function(err, res) {
+          expect(err).toBeNull();
+          expect(res.body).toBeDefined();
+          done();
+        });
+    })();
 
-  //   })();
-  // });
+    it('21. getAllDocumentsByDate', function(done) {
+      request(app)
+        .get('/api/document/documentbydate')
+        .set('Accept', 'application/json')
+        .set('x-access-token', token)
+        .end(function(err, res) {
+          expect(err).toBeNull();
+          expect(res.body).toBeDefined();
+          done();
+        });
+    })();
+
+    it('20. getAllDocumentsByRole', function(done) {
+      request(app)
+        .get('/api/document/getAllDocumentsByRole')
+        .set('Accept', 'application/json')
+        .set('x-access-token', token)
+        .end(function(err, res) {
+          expect(err).toBeNull();
+          expect(res.body).toBeDefined();
+          done();
+        });
+    })();
+  });
 })();

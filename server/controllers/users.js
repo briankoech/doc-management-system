@@ -95,14 +95,18 @@
                 res.status(500).send({
                   error: err
                 });
-              } else {
-                result.password = null;
+              } else if (result) {
+                //result.password = null;
                 var token = createToken(result);
-                res.json({
+                res.status(200).send({
                   success: true,
                   message: 'login success',
                   token: token,
                   user: result
+                });
+              } else {
+                res.status(404).send({
+                  message: 'could not log in'
                 });
               }
             });
@@ -137,7 +141,7 @@
               if (err) {
                 res.status(403).send(errormsg);
               } else {
-                if (user.loggedIn) {
+                if (user && user.loggedIn) {
                   next();
                 } else {
                   res.status(403).send(errormsg);

@@ -7,12 +7,14 @@
   describe('User', function() {
     var token;
 
-    beforeAll(function(done) {
-      helper.create(app, function() {
-        helper.login(app, 'mark', 'abc123', function(tokn) {
-          token = tokn;
+    beforeEach(function(done) {
+      helper.login(app, 'mark', 'abc123', function(body) {
+        if (body) {
+          token = body.token;
           done();
-        });
+        } else {
+          return;
+        }
       });
     });
 
@@ -52,7 +54,7 @@
         .end(function(err, res) {
           expect(err).toBeNull();
           expect(res.body.error).toBeDefined();
-          expect(res.body.error).toContain('duplicate key error');
+          expect(res.body.error.errmsg).toContain('duplicate key error');
           done();
         });
     });

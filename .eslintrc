@@ -19,7 +19,9 @@
   "env": {
     "es6": true,
     "node": true,
-    "jasmine": true
+    "jasmine": true,
+    es6: true,
+    amd: true
   },
   "extends": "eslint:recommended"
 }
