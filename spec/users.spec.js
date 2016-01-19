@@ -1,13 +1,17 @@
 (function() {
   'use strict';
+
   var request = require('supertest');
   var app = require('../server');
   var helper = require('./login-helper');
+  var seed = require('./jhelpers/seed-helper');
 
   describe('User', function() {
     var token;
 
-    beforeEach(function(done) {
+    beforeAll(function(done) {
+      console.log('USER SPEC IS RUNNING');
+      seed();
       helper.login(app, 'mark', 'abc123', function(body) {
         if (body) {
           token = body.token;

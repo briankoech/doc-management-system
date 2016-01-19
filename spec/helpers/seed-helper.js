@@ -9,6 +9,7 @@
   var seeder = require('mongoose-seed');
   var config = require('../../server/config/config');
 
+  console.log('SEED IS RUNNING');
   seeder.connect(config.database, function() {
     // Load models
     seeder.loadModels(['./server/models/document.js',
@@ -18,7 +19,7 @@
     ]);
     // clear models
     seeder.clearModels(['Document', 'Role', 'User', 'Category'], function() {
-
+      console.log('MODELS CLEARED');
       async.waterfall([
         // create roles
         function(callback) {

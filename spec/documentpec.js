@@ -4,22 +4,29 @@
   var request = require('supertest');
   var app = require('../server');
   var helper = require('./login-helper.js');
+  require('./helpers/seed-helper')();
 
   describe('15. Documents', function() {
     var token;
     var userId;
 
-    beforeAll(function(done) {
+    beforeEach(function(done) {
       helper.login(app, 'mark', 'abc123', function(body) {
         if (body) {
           token = body.token;
+          // console.log('BODYNBODJDJ IS RUNNING TOO', body.user._id);
           userId = body.user._id;
           done();
         } else {
           return;
         }
-
       });
+    });
+
+    it('function delay', function(done) {
+      // console.log('DELAYS FOR SOMETIME', token);
+
+      done();
     });
 
     it('16. Doc created has a published date', function(done) {
@@ -35,14 +42,12 @@
         .set('Accept', 'application/json')
         .set('x-access-token', token)
         .end(function(err, res) {
-          console.log("DATTTTATATTA");
-          console.log(userId);
-          console.log(res.body);
           expect(err).toBeNull();
           expect(res.body).toBeDefined();
-          expect(res.body.message).toBe('Document and role added successfuly');
+          expect(res.body.message).toBe('Document created successfuly');
+          console.log(res.body);
           expect(res.body.doc).toBeDefined();
-          //expect(res.body.doc.createdAt).toBeDefined();
+          expect(res.body.doc.createdAt).toBeDefined();
           expect(typeof res.body.role).toBe('object');
           done();
         });
