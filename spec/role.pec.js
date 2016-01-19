@@ -3,30 +3,22 @@
 
   var request = require('supertest');
   var app = require('../server');
-  var helper = require('./login-helper');
-  //require('./helpers/seed-helper')();
+  var seed = require('./seed-helper');
 
   describe('Roles', function() {
 
     var token;
 
-    beforeEach(function(done) {
-      console.log('ROLE SPEC IS RUNNING');
-      helper.login(app, 'mark', 'abc123', function(body) {
-        if (body) {
-          token = body.token;
-        }
+    beforeAll(function(done) {
+      seed(app, function(body) {
+        console.log('TOKEN IS HERE ROLE', body);
+        token = body.token;
         done();
       });
+      done();
     });
 
-    // it('Role is alright', function(done) {
-    //   // console.log('this is going to work', token);
-    //   done();
-    // });
-
     it('Role created successfully', function(done) {
-      console.log("token:", token);
       request(app)
         .post('/api/roles')
         .send({
@@ -35,7 +27,6 @@
         .set('Accept', 'application/json')
         .set('x-access-token', token)
         .end(function(err, res) {
-          console.log('TOKEN TOKENE OTKNRJN', token);
           expect(err).toBeNull();
           // console.log(res.body);
           expect(res.body).toBeDefined();

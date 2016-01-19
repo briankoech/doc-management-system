@@ -3,30 +3,19 @@
 
   var request = require('supertest');
   var app = require('../server');
-  var helper = require('./login-helper.js');
-  require('./helpers/seed-helper')();
+  var seed = require('./seed-helper.js');
 
   describe('15. Documents', function() {
     var token;
     var userId;
 
-    beforeEach(function(done) {
-      helper.login(app, 'mark', 'abc123', function(body) {
-        if (body) {
-          token = body.token;
-          // console.log('BODYNBODJDJ IS RUNNING TOO', body.user._id);
-          userId = body.user._id;
-          done();
-        } else {
-          return;
-        }
+    beforeAll(function(done) {
+      seed(app, function(body) {
+        console.log('TOKEN IS HERE DOC', body.token);
+        token = body.token;
+        userId = body.user._id;
+        done();
       });
-    });
-
-    it('function delay', function(done) {
-      // console.log('DELAYS FOR SOMETIME', token);
-
-      done();
     });
 
     it('16. Doc created has a published date', function(done) {
@@ -45,10 +34,8 @@
           expect(err).toBeNull();
           expect(res.body).toBeDefined();
           expect(res.body.message).toBe('Document created successfuly');
-          console.log(res.body);
           expect(res.body.doc).toBeDefined();
           expect(res.body.doc.createdAt).toBeDefined();
-          expect(typeof res.body.role).toBe('object');
           done();
         });
     });
@@ -59,10 +46,9 @@
         .set('Accept', 'application/json')
         .set('x-access-token', token)
         .end(function(err, res) {
-          //console.log(res.body);
           expect(err).toBeNull();
           expect(res.body).toBeDefined();
-          expect(Array.isArray(res)).toBe(true);
+          expect(Array.isArray(res.body)).toBe(true);
           expect(res.length).toBeGreaterThan(0);
           expect(res.length).toBeLessThan(10);
           done();
@@ -71,10 +57,12 @@
 
     it('18. returns docs in order of their date', function(done) {
       request(app)
-        .get('/api/document')
+        .get('/api/documentbydate/?from=10-10-1993&to=10-10-2016')
         .set('Accept', 'application/json')
-        .end(function(err, docs) {
-          expect(docs).toBeDefined();
+        .set('x-access-token', token)
+        .end(function(err, res) {
+          console.log(res.body);
+          expect(res).toBeDefined();
           //expect(docs[0].createdAt).toBeLessThan(docs[3].createdAt);
           done();
         });

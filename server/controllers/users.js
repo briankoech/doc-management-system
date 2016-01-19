@@ -96,7 +96,7 @@
                   error: err
                 });
               } else if (result) {
-                console.log('THISHISHISH', result);
+                //console.log('THISHISHISH', result);
                 //result.password = null;
                 var token = createToken(result);
                 res.status(200).send({

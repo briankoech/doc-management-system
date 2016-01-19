@@ -3,22 +3,16 @@
 
   var request = require('supertest');
   var app = require('../server');
-  var helper = require('./login-helper');
-  var seed = require('./jhelpers/seed-helper');
+  var seed = require('./seed-helper');
 
   describe('User', function() {
     var token;
 
     beforeAll(function(done) {
-      console.log('USER SPEC IS RUNNING');
-      seed();
-      helper.login(app, 'mark', 'abc123', function(body) {
-        if (body) {
-          token = body.token;
-          done();
-        } else {
-          return;
-        }
+      seed(app, function(body) {
+        console.log('TOKEN IS HERE USER');
+        token = body.token;
+        done();
       });
     });
 
