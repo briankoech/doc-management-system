@@ -13,6 +13,7 @@
     api.get('/documentbycategory', Document.getDocumenstByCategory);
     api.get('/document/:_id', Document.findOne);
     api.put('/document/:_id', Document.update);
+    api.put('/document/addcontributors/:_id', Document.addContributors);
     api.delete('/document/:_id', Document.delete);
 
     api.get('/users/:userId/documents', Document.getAllById);

@@ -3,7 +3,7 @@
   var Document = require('../models/document'),
     Role = require('../models/role'),
     Category = require('../models/category'),
-    users = require('./users');
+    User = require('../models/user');
 
 
   module.exports = {
@@ -194,8 +194,69 @@
     },
 
     addContributors: function(req, res) {
+      // Get the doc
+      // check if you are the owner or admin
       // get the contributorsId check if it exists
-
+      Document.findById(req.params._id, function(err, doc) {
+        if (err) {
+          res.status(500).send({
+            error: err
+          });
+        } else if (!doc) {
+          res.status(404).send({
+            message: 'No such doc'
+          });
+        } else {
+          // get the user role
+          Role.findById(req.decoded.role, function(err, role) {
+            if (err) {
+              res.status(500).send({
+                error: err
+              });
+            } else {
+              // check the role
+              if (doc.ownerId === req.decoded._id || role.title === 'admin') {
+                // can add contributors to doc
+                User.findById(req.body.contributor, function(err, user) {
+                  if (err) {
+                    res.status(500).send({
+                      error: err
+                    });
+                  } else if (!user) {
+                    res.status(404).send({
+                      message: 'no such user'
+                    });
+                  } else {
+                    Document.findByIdAndUpdate(doc._id, {
+                      $push: {
+                        'contributors': req.body.contributor
+                      }
+                    }, {
+                      safe: true,
+                      upsert: true
+                    }, function(err, result) {
+                      if (err) {
+                        res.status(500).send({
+                          error: err
+                        });
+                      } else {
+                        res.status(200).send({
+                          message: 'contributor added',
+                          doc: result
+                        });
+                      }
+                    });
+                  }
+                });
+              } else {
+                res.status(401).send({
+                  message: 'you are not authorised'
+                });
+              }
+            }
+          });
+        }
+      });
     },
 
     findOne: function(req, res) {
