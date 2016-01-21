@@ -83,6 +83,7 @@
         .set('Accept', 'application/json')
         .set('x-access-token', token)
         .end(function(err, res) {
+          console.log(res.body[0]._id);
           request(app)
             .put('/api/category/' + res.body[0]._id)
             .send({
