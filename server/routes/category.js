@@ -9,6 +9,7 @@
     api.post('/category', Category.create);
     api.get('/category', Category.getAllCategories);
     api.put('/category/:id', Category.update);
+    api.delete('/category/:id', Category.delete);
     app.use('/api', api);
   };
 })();

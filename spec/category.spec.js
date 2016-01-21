@@ -61,7 +61,7 @@
         });
     });
 
-    it('Type can be fetched updated and deleted', function(done) {
+    it('Types can be fetched', function(done) {
       request(app)
         .get('/api/category')
         .set('Accept', 'application/json')
@@ -76,36 +76,50 @@
         });
     });
 
-    it('Type can be fetched updated and deleted', function(done) {
+    it('Type can be updated', function(done) {
+      // get the id to update
       request(app)
         .get('/api/category')
         .set('Accept', 'application/json')
         .set('x-access-token', token)
         .end(function(err, res) {
-          expect(err).toBeNull();
-          expect(res.body).toBeDefined();
-          expect(res.status).toBe(200);
-          expect(Array.isArray(res.body)).toBe(true);
-          expect(res.body.length).toBeGreaterThan(4);
-          done();
+          request(app)
+            .put('/api/category/' + res.body[0]._id)
+            .send({
+              title: 'songs'
+            })
+            .set('Accept', 'application/json')
+            .set('x-access-token', token)
+            .end(function(err, res) {
+              expect(err).toBeNull();
+              expect(res.status).toEqual(200);
+              expect(res.body.message).toBeDefined();
+              expect(res.body.message).toBe('update was successful');
+              done();
+            });
         });
     });
 
     it('Type can be updated and deleted', function(done) {
       request(app)
-        .put('/api/category')
-        .send({
-          category: 'T'
-        })
+        .get('/api/category')
         .set('Accept', 'application/json')
         .set('x-access-token', token)
         .end(function(err, res) {
-          expect(err).toBeNull();
-          expect(res.body).toBeDefined();
-          expect(res.status).toBe(200);
-          expect(Array.isArray(res.body)).toBe(true);
-          expect(res.body.length).toBeGreaterThan(4);
-          done();
+          request(app)
+            .delete('/api/category/' + res.body[0]._id)
+            .send({
+              title: 'songs'
+            })
+            .set('Accept', 'application/json')
+            .set('x-access-token', token)
+            .end(function(err, res) {
+              expect(err).toBeNull();
+              expect(res.status).toEqual(200);
+              expect(res.body.message).toBeDefined();
+              expect(res.body.message).toBe('Deleted successfully');
+              done();
+            });
         });
     });
   });
