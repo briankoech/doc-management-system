@@ -3,14 +3,13 @@
 
   var request = require('supertest');
   var app = require('../server');
-  var seed = require('./seed-helper');
+  var helper = require('./seed-helper');
 
   describe('User', function() {
     var token;
 
     beforeAll(function(done) {
-      seed(app, function(body) {
-        console.log('TOKEN IS HERE USER');
+      helper.seed(function(body) {
         token = body.token;
         done();
       });
@@ -93,6 +92,11 @@
           expect(res.body.user.name.last).toBe('Anne');
           done();
         });
+    });
+
+    it('user logs in successfully', function(done) {
+      expect(token).toBeDefined();
+      done();
     });
 
     it('Returns all users when getAllUsers is called', function(done) {

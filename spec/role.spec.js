@@ -3,22 +3,20 @@
 
   var request = require('supertest');
   var app = require('../server');
-  var seed = require('./seed-helper');
+  var helper = require('./seed-helper');
 
   describe('Roles', function() {
 
     var token;
 
     beforeAll(function(done) {
-      seed(app, function(body) {
-        console.log('TOKEN IS HERE ROLE', body);
+      helper.seed(function(body) {
         token = body.token;
         done();
       });
-      done();
     });
 
-    it('Role created successfully', function(done) {
+    it('Role created must be unique', function(done) {
       request(app)
         .post('/api/roles')
         .send({
@@ -28,9 +26,9 @@
         .set('x-access-token', token)
         .end(function(err, res) {
           expect(err).toBeNull();
-          // console.log(res.body);
+          expect(res.status).toEqual(500);
           expect(res.body).toBeDefined();
-          expect(res.body.title).toBe('viewer');
+          expect(res.body.error).toBe('E11000 duplicate key error index: test.roles.$title_1 dup key: { : "viewer" }');
           done();
         });
     });
@@ -45,6 +43,7 @@
         .set('x-access-token', token)
         .end(function(err, res) {
           expect(err).toBeNull();
+          expect(res.status).toEqual(500);
           expect(res.body.error).toBeDefined();
           expect(res.body.error).toContain('duplicate key error');
           done();
@@ -58,6 +57,7 @@
         .set('x-access-token', token)
         .end(function(err, res) {
           expect(err).toBeNull();
+          expect(res.status).toEqual(200);
           expect(res.body).toBeDefined();
           expect(Array.isArray(res.body)).toBe(true);
           expect(res.body.length).toEqual(3);
@@ -65,4 +65,5 @@
         });
     });
   });
+
 })();

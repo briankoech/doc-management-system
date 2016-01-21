@@ -170,7 +170,7 @@
     getDocumenstByCategory: function(req, res) {
       // find the categoryId
       Category.find({
-        category: req.params.category.toLowerCase
+        category: req.query.category.toLowerCase()
       }, function(err, category) {
         if (err) {
           res.status(500).send({
@@ -179,7 +179,7 @@
         } else {
           // get the categoryId
           Document.find({
-            category: category._id
+            category: category[0]._id
           }, function(err, documents) {
             if (err) {
               res.status(500).send({

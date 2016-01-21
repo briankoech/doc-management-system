@@ -134,7 +134,7 @@
       if (token) {
         jwt.verify(token, secretKey, function(err, decoded) {
           if (err) {
-            res.status(403).send();
+            res.status(403).send(err);
           } else {
             // check if loggedIn is true
             req.decoded = decoded;

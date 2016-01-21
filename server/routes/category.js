@@ -8,7 +8,7 @@
 
     api.post('/category', Category.create);
     api.get('/category', Category.getAllCategories);
-
+    api.put('/category/:id', Category.update);
     app.use('/api', api);
   };
 })();
