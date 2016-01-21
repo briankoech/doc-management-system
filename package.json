@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/bryomckim/doc-management-system#readme",
   "dependencies": {
+    "async": "^1.5.2",
     "babel-eslint": "^4.1.6",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.14.1",

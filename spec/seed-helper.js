@@ -1,7 +1,6 @@
 (function() {
   'use strict';
 
-
   var Users = require('../server/models/user');
   var Document = require('../server/models/document');
   var Roles = require('../server/models/role');
