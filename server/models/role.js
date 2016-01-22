@@ -11,7 +11,7 @@
       index: {
         unique: true
       },
-      enum: ['admin', 'contributor', 'viewer']
+      enum: ['admin', 'contributor', 'viewer', 'administrator']
     }
   });
 

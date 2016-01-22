@@ -101,7 +101,7 @@
         });
     });
 
-    it('Type can be updated and deleted', function(done) {
+    it('Type can be deleted', function(done) {
       request(app)
         .get('/api/category')
         .set('Accept', 'application/json')

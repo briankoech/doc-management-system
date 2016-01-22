@@ -32,6 +32,24 @@
       });
     },
 
+    checkUserRole: function(req, res, next) {
+      Roles.findById(req.decoded.role, function(err, role) {
+        if (err) {
+          res.status(500).send({
+            error: err
+          });
+        } else {
+          if (role.title === 'admin') {
+            next();
+          } else {
+            res.status(401).send({
+              message: 'You are not authorised'
+            });
+          }
+        }
+      });
+    },
+
     update: function(req, res) {
       Roles.findById(req.params.id, function(err, role) {
         if (err) {
@@ -76,7 +94,7 @@
 
     delete: function(req, res) {
       Roles.remove({
-        _id: req.params.id
+        _id: req.query.id
       }, function(err, ok) {
         if (err) {
           res.status(500).send({

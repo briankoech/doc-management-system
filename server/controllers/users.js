@@ -134,25 +134,25 @@
       if (token) {
         jwt.verify(token, secretKey, function(err, decoded) {
           if (err) {
-            res.status(403).send(err);
+            res.status(401).send(err);
           } else {
             // check if loggedIn is true
             req.decoded = decoded;
             User.findById(req.decoded._id, function(err, user) {
               if (err) {
-                res.status(403).send(errormsg);
+                res.status(401).send(errormsg);
               } else {
                 if (user && user.loggedIn) {
                   next();
                 } else {
-                  res.status(403).send(errormsg);
+                  res.status(401).send(errormsg);
                 }
               }
             });
           }
         });
       } else {
-        res.status(403).send({
+        res.status(401).send({
           success: false,
           message: 'No token provided'
         });
@@ -260,9 +260,14 @@
                       error: err
                     });
                   } else {
-                    res.status(200).send({
-                      message: 'delete successful'
-                    });
+                    if (req.decoded.id === user._id) {
+                      this.logout;
+                    } else {
+                      res.status(200).send({
+                        message: 'delete successful'
+                      });
+                    }
+
                   }
                 });
               } else {

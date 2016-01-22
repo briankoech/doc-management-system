@@ -64,6 +64,50 @@
           done();
         });
     });
+
+    it('Cannot create a new role if user is not authenticated', function(done) {
+      request(app)
+        .post('/api/roles')
+        .send({
+          title: 'admin'
+        })
+        .set('Accept', 'application/json')
+        .set('x-access-token', null)
+        .end(function(err, res) {
+          expect(err).toBeNull();
+          expect(res.body).toBeDefined();
+          expect(res.body.message).toBe('jwt malformed');
+          done();
+        });
+    });
+
+    it('Role can be edited only by and admin', function(done) {
+      // get the role first
+      request(app)
+        .get('/api/roles')
+        .send({
+          title: 'admin'
+        })
+        .set('Accept', 'application/json')
+        .set('x-access-token', token)
+        .end(function(err, res) {
+          request(app)
+            .put('/api/roles/' + res.body[0]._id)
+            .send({
+              title: 'administrator'
+            })
+            .set('Accept', 'application/json')
+            .set('x-access-token', token)
+            .end(function(err, res) {
+              expect(err).toBeNull();
+              expect(res.body).toBeDefined();
+              expect(res.body.message).toBe('update was successful');
+              done();
+            });
+        });
+
+
+    });
   });
 
 })();

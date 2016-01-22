@@ -31,6 +31,7 @@
           expect(err).toBeNull();
           expect(typeof res.body).toBe('object');
           expect(res.body).toBeDefined();
+          expect(res.status).toEqual(200);
           expect(res.body.message).toBe('User created Successfully');
           done();
         });
@@ -51,6 +52,7 @@
         .end(function(err, res) {
           expect(err).toBeNull();
           expect(res.body.error).toBeDefined();
+          expect(res.status).toEqual(500);
           expect(res.body.error.errmsg).toContain('duplicate key error');
           done();
         });
@@ -70,6 +72,7 @@
         .set('Accept', 'application/json')
         .end(function(err, res) {
           expect(err).toBeNull();
+          expect(res.status).toEqual(200);
           expect(res.body.user.role).toBeDefined();
           done();
         });
@@ -88,6 +91,9 @@
         })
         .set('Accept', 'application/json')
         .end(function(err, res) {
+          expect(err).toBeNull();
+          expect(res.body).toBeDefined();
+          expect(res.status).toEqual(200);
           expect(res.body.user.name.first).toBe('Mary');
           expect(res.body.user.name.last).toBe('Anne');
           done();
@@ -105,6 +111,7 @@
         .set('Accept', 'application/json')
         .set('x-access-token', token)
         .end(function(err, res) {
+          expect(res.status).toEqual(200);
           expect(Array.isArray(res.body)).toBe(true);
           expect(res.body.length).toBeGreaterThan(2);
           done();
