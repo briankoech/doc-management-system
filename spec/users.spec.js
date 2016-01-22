@@ -31,7 +31,7 @@
           expect(err).toBeNull();
           expect(typeof res.body).toBe('object');
           expect(res.body).toBeDefined();
-          expect(res.status).toEqual(200);
+          expect(res.status).toEqual(201);
           expect(res.body.message).toBe('User created Successfully');
           done();
         });
@@ -72,7 +72,7 @@
         .set('Accept', 'application/json')
         .end(function(err, res) {
           expect(err).toBeNull();
-          expect(res.status).toEqual(200);
+          expect(res.status).toEqual(201);
           expect(res.body.user.role).toBeDefined();
           done();
         });
@@ -93,7 +93,7 @@
         .end(function(err, res) {
           expect(err).toBeNull();
           expect(res.body).toBeDefined();
-          expect(res.status).toEqual(200);
+          expect(res.status).toEqual(201);
           expect(res.body.user.name.first).toBe('Mary');
           expect(res.body.user.name.last).toBe('Anne');
           done();
