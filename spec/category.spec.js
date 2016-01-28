@@ -78,7 +78,7 @@
         });
     });
 
-    it('Type can be updated', function(done) {
+    it('Type can be updated by admin', function(done) {
       // get the id to update
       request(app)
         .get('/api/category')
@@ -102,7 +102,7 @@
         });
     });
 
-    it('Type can be deleted', function(done) {
+    it('Type can be deleted only by an admin', function(done) {
       request(app)
         .get('/api/category')
         .set('Accept', 'application/json')
@@ -124,5 +124,53 @@
             });
         });
     });
+
+    it('category cannot be deleted by a viewer', function(done) {
+      helper.login('drogba', 'abc123', function(body) {
+        request(app)
+          .get('/api/category')
+          .set('Accept', 'application/json')
+          .set('x-access-token', body.token)
+          .end(function(err, res) {
+            request(app)
+              .delete('/api/category/' + res.body[0]._id)
+              .set('Accept', 'application/json')
+              .set('x-access-token', body.token)
+              .end(function(err, res) {
+                expect(err).toBeNull();
+                expect(res.status).toEqual(403);
+                expect(res.body.message).toBeDefined();
+                expect(res.body.message).toBe('You are not authorised');
+                done();
+              });
+          });
+      });
+    });
+
+    it('cannot be updated by a viewer', function(done) {
+      helper.login('drogba', 'abc123', function(body) {
+        request(app)
+          .get('/api/category')
+          .set('Accept', 'application/json')
+          .set('x-access-token', body.token)
+          .end(function(err, res) {
+            request(app)
+              .delete('/api/category/' + res.body[0]._id)
+              .send({
+                title: 'Science and technology'
+              })
+              .set('Accept', 'application/json')
+              .set('x-access-token', body.token)
+              .end(function(err, res) {
+                expect(err).toBeNull();
+                expect(res.status).toEqual(403);
+                expect(res.body.message).toBeDefined();
+                expect(res.body.message).toBe('You are not authorised');
+                done();
+              });
+          });
+      });
+    });
+
   });
 })();

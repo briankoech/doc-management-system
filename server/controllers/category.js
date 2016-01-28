@@ -85,7 +85,6 @@
             message: 'Deleted successfully'
           });
         }
-
       });
     }
   };

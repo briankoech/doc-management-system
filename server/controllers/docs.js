@@ -338,7 +338,7 @@
                 error: err
               });
             } else if (doc) {
-              if (role.title === 'admin' || req.decoded._id === doc.ownerId) {
+              if (role.title === 'admin' || req.decoded._id.toString() === doc.ownerId.toString()) {
                 Document.remove({
                   _id: req.params._id
                 }, function(err) {
