@@ -13,12 +13,14 @@
           return res.status(409).send({
             error: err.message
           });
-        } else if(err && err.message.indexOf('validation failed') > -1) {
+        } else if (err && err.message.indexOf('validation failed') > -1) {
           return res.status(406).send({
             error: err.message
           });
-        } else if(err) {
-          return res.status(500).send({error: err});
+        } else if (err) {
+          return res.status(500).send({
+            error: err
+          });
         } else {
           res.status(201).send({
             message: 'successfully created category',

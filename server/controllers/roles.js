@@ -13,7 +13,7 @@
           return res.status(409).send({
             error: err.errmsg
           });
-        } else if(err) {
+        } else if (err) {
           res.status(500).send({
             error: err.errmsg
           });

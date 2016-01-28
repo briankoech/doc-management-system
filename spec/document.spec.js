@@ -26,24 +26,24 @@
 
       it('viewer cannot create a document', function(done) {
         helper.login('drogba', 'abc123', function(body) {
-              request(app)
-                .post('/api/document/')
-                .send({
-                  ownerId: body.user._id,
-                  title: 'TIA',
-                  category: 'Lifestyle',
-                  content: 'Keeping up with being TIA',
-                  createdAt: new Date()
-                })
-                .set('Accept', 'application/json')
-                .set('x-access-token', body.token)
-                .end(function(err, rs) {
-                  expect(err).toBeNull();
-                  expect(rs.status).toEqual(403);
-                  expect(rs.body.error).toBeDefined();
-                  expect(rs.body.error).toBe('You are not authorised to create document');
-                  done();
-                });
+          request(app)
+            .post('/api/document/')
+            .send({
+              ownerId: body.user._id,
+              title: 'TIA',
+              category: 'Lifestyle',
+              content: 'Keeping up with being TIA',
+              createdAt: new Date()
+            })
+            .set('Accept', 'application/json')
+            .set('x-access-token', body.token)
+            .end(function(err, rs) {
+              expect(err).toBeNull();
+              expect(rs.status).toEqual(403);
+              expect(rs.body.error).toBeDefined();
+              expect(rs.body.error).toBe('You are not authorised to create document');
+              done();
+            });
         });
       });
 
@@ -190,23 +190,23 @@
       });
 
       it('Admin can delete a document', function(done) {
-          request(app)
-            .get('/api/document')
-            .set('Accept', 'application/json')
-            .set('x-access-token', token)
-            .end(function(err, res) {
-              request(app)
-                .delete('/api/document/' + res.body[0]._id)
-                .set('Accept', 'application/json')
-                .set('x-access-token', token)
-                .end(function(err, res) {
-                  expect(err).toBeNull();
-                  expect(res.status).toEqual(200);
-                  expect(res.body.message).toBeDefined();
-                  expect(res.body.message).toBe('delete successfuly');
-                  done();
-                });
-            });
+        request(app)
+          .get('/api/document')
+          .set('Accept', 'application/json')
+          .set('x-access-token', token)
+          .end(function(err, res) {
+            request(app)
+              .delete('/api/document/' + res.body[0]._id)
+              .set('Accept', 'application/json')
+              .set('x-access-token', token)
+              .end(function(err, res) {
+                expect(err).toBeNull();
+                expect(res.status).toEqual(200);
+                expect(res.body.message).toBeDefined();
+                expect(res.body.message).toBe('delete successfuly');
+                done();
+              });
+          });
       });
 
       it('Non owner/ non-admin cannot delete a document', function(done) {

@@ -113,19 +113,19 @@
       // get the role first
       helper.login('martial', 'abc123', function(body) {
         request(app)
-        .get('/api/roles')
-        .send({
-          title: 'admin'
-        })
-        .set('Accept', 'application/json')
-        .set('x-access-token', body.token)
-        .end(function(err, res) {
+          .get('/api/roles')
+          .send({
+            title: 'admin'
+          })
+          .set('Accept', 'application/json')
+          .set('x-access-token', body.token)
+          .end(function(err, res) {
             expect(err).toBeNull();
             expect(res.status).toEqual(403);
             expect(res.body).toBeDefined();
             expect(res.body.message).toBe('You are not authorised');
             done();
-        });
+          });
 
       });
     });

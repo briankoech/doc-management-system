@@ -44,8 +44,10 @@
               return res.status(409).send({
                 error: err
               });
-            } else if(err) {
-              return res.status(500).send({error: err});
+            } else if (err) {
+              return res.status(500).send({
+                error: err
+              });
             }
             user.password = null;
             res.status(201).send({
