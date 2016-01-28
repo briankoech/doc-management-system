@@ -44,7 +44,7 @@
           });
         } else {
           if (role.title === 'viewer') {
-            res.status(401).send({
+            res.status(403).send({
               error: 'You are not authorised to create document'
             });
           } else {
@@ -249,7 +249,7 @@
                   }
                 });
               } else {
-                res.status(401).send({
+                res.status(403).send({
                   message: 'you are not authorised'
                 });
               }
@@ -297,7 +297,7 @@
                   }): res.status(200).send(result);
                 });
               } else {
-                res.status(401).send({
+                res.status(403).send({
                   message: 'You are not allowed to edit this doc'
                 });
               }
@@ -349,7 +349,7 @@
                   });
                 });
               } else {
-                res.status(401).send({
+                res.status(403).send({
                   message: 'You are not allowed to delete this doc'
                 });
               }

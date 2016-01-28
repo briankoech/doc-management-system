@@ -9,7 +9,11 @@
       });
 
       role.save(function(err, role) {
-        if (err) {
+        if (err.errmsg.indexOf('duplicate key') > -1) {
+          return res.status(409).send({
+            error: err.errmsg
+          });
+        } else if(err) {
           res.status(500).send({
             error: err.errmsg
           });
@@ -42,7 +46,7 @@
           if (role.title === 'admin') {
             next();
           } else {
-            res.status(401).send({
+            res.status(403).send({
               message: 'You are not authorised'
             });
           }
@@ -83,7 +87,7 @@
         if (err) {
           res.status(500).send(err);
         } else if (!roles) {
-          res.status(500).send({
+          res.status(404).send({
             error: 'no roles found'
           });
         } else {
@@ -95,7 +99,7 @@
     delete: function(req, res) {
       Roles.remove({
         _id: req.query.id
-      }, function(err, ok) {
+      }, function(err) {
         if (err) {
           res.status(500).send({
             error: err

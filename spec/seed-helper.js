@@ -11,30 +11,25 @@
 
   module.exports = {
     seed: function(done) {
-      console.log('SEED IS RUNNING');
       async.waterfall([
         // clear db
         function(callback) {
-          Users.remove({}, function(err, rs) {
-            console.log('users removed');
+          Users.remove({}, function(err) {
             callback(err);
           });
         },
         function(callback) {
-          Document.remove({}, function(err, rs) {
-            console.log('Documents removed');
+          Document.remove({}, function(err) {
             callback(err);
           });
         },
         function(callback) {
-          Roles.remove({}, function(err, rs) {
-            console.log('Roles removed');
+          Roles.remove({}, function(err) {
             callback(err);
           });
         },
         function(callback) {
-          Category.remove({}, function(err, rs) {
-            console.log('Category removed');
+          Category.remove({}, function(err) {
             callback(err);
           });
         },
@@ -55,7 +50,6 @@
               var roleIds = role.map(function(element) {
                 return element._id;
               });
-              console.log('roles added');
               callback(null, roleIds);
             }
           });
@@ -111,10 +105,8 @@
 
           Users.create(users, function(err, user) {
             if (err) {
-              console.log('error');
               return;
             } else {
-              console.log('users added');
               callback(null, user);
             }
 
@@ -140,10 +132,8 @@
 
           Category.create(categories, function(err, result) {
             if (err) {
-              console.log('categories error', err);
               return;
             } else {
-              console.log('categories added');
               callback(null, user, result);
             }
           });
@@ -184,9 +174,7 @@
             if (err) {
               return;
             } else {
-              console.log('Documents added');
               done();
-              //done();
             }
           });
         },

@@ -40,11 +40,12 @@
 
           //save the user
           user.save(function(err, user) {
-            if (err) {
-              res.status(500).send({
+            if (err && err.errmsg.indexOf('duplicate key') > -1) {
+              return res.status(409).send({
                 error: err
               });
-              return;
+            } else if(err) {
+              return res.status(500).send({error: err});
             }
             user.password = null;
             res.status(201).send({
@@ -53,7 +54,7 @@
             });
           });
         } else {
-          res.status(500).send({
+          res.status(404).send({
             error: 'No such role defined'
           });
         }
@@ -106,7 +107,7 @@
                   user: result
                 });
               } else {
-                res.status(404).send({
+                res.status(401).send({
                   message: 'could not log in'
                 });
               }
@@ -200,7 +201,7 @@
                 message: 'no such user'
               });
             } else {
-              if (role.title === 'admin' || req.decoded.id === user._id) {
+              if (role.title === 'admin' || req.decoded._id.toString() === user._id.toString()) {
                 //user.password = null;
                 req.user = user;
                 req.user.name.first = req.body.firstname;
@@ -222,8 +223,8 @@
                 });
 
               } else {
-                res.status(401).send({
-                  message: 'You are not allowed to delete this user'
+                res.status(403).send({
+                  message: 'You are not allowed to edit this user'
                 });
               }
             }
@@ -271,7 +272,7 @@
                   }
                 });
               } else {
-                res.status(401).send({
+                res.status(403).send({
                   message: 'You are not allowed to delete this user'
                 });
               }

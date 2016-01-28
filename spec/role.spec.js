@@ -26,7 +26,7 @@
         .set('x-access-token', token)
         .end(function(err, res) {
           expect(err).toBeNull();
-          expect(res.status).toEqual(500);
+          expect(res.status).toEqual(409);
           expect(res.body).toBeDefined();
           expect(res.body.error).toBe('E11000 duplicate key error index: test.roles.$title_1 dup key: { : "viewer" }');
           done();
@@ -43,7 +43,7 @@
         .set('x-access-token', token)
         .end(function(err, res) {
           expect(err).toBeNull();
-          expect(res.status).toEqual(500);
+          expect(res.status).toEqual(409);
           expect(res.body.error).toBeDefined();
           expect(res.body.error).toContain('duplicate key error');
           done();
@@ -76,6 +76,7 @@
         .end(function(err, res) {
           expect(err).toBeNull();
           expect(res.body).toBeDefined();
+          expect(res.status).toEqual(401);
           expect(res.body.message).toBe('jwt malformed');
           done();
         });
@@ -100,13 +101,33 @@
             .set('x-access-token', token)
             .end(function(err, res) {
               expect(err).toBeNull();
+              expect(res.status).toEqual(200);
               expect(res.body).toBeDefined();
               expect(res.body.message).toBe('update was successful');
               done();
             });
         });
+    });
 
+    it('Role cannot be accessed by a non admin', function(done) {
+      // get the role first
+      helper.login('martial', 'abc123', function(body) {
+        request(app)
+        .get('/api/roles')
+        .send({
+          title: 'admin'
+        })
+        .set('Accept', 'application/json')
+        .set('x-access-token', body.token)
+        .end(function(err, res) {
+            expect(err).toBeNull();
+            expect(res.status).toEqual(403);
+            expect(res.body).toBeDefined();
+            expect(res.body.message).toBe('You are not authorised');
+            done();
+        });
 
+      });
     });
   });
 

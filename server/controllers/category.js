@@ -9,10 +9,16 @@
       });
 
       category.save(function(err, category) {
-        if (err) {
-          res.status(500).send({
+        if (err && err.message.indexOf('duplicate key') > -1) {
+          return res.status(409).send({
             error: err.message
           });
+        } else if(err && err.message.indexOf('validation failed') > -1) {
+          return res.status(406).send({
+            error: err.message
+          });
+        } else if(err) {
+          return res.status(500).send({error: err});
         } else {
           res.status(201).send({
             message: 'successfully created category',
@@ -69,7 +75,7 @@
     delete: function(req, res) {
       Category.remove({
         _id: req.params.id
-      }, function(err, ok) {
+      }, function(err) {
         if (err) {
           res.status(500).send({
             error: err

@@ -24,6 +24,7 @@
         .set('x-access-token', null)
         .end(function(err, res) {
           expect(err).toBeNull();
+          expect(res.status).toEqual(401);
           expect(res.body).toBeDefined();
           expect(res.body.message).toBe('jwt malformed');
           done();
@@ -40,6 +41,7 @@
         .set('x-access-token', token)
         .end(function(err, res) {
           expect(err).toBeNull();
+          expect(res.status).toEqual(409);
           expect(res.body).toBeDefined();
           expect(res.body.error).toContain('E11000 duplicate key error index: test.categories.$category_1 dup key: { : "music" }');
           done();
@@ -55,7 +57,7 @@
         .end(function(err, res) {
           expect(err).toBeNull();
           expect(res.body).toBeDefined();
-          expect(res.status).toBe(500);
+          expect(res.status).toBe(406);
           expect(res.body.error).toContain('Category validation failed');
           done();
         });

@@ -24,6 +24,29 @@
         done();
       });
 
+      it('viewer cannot create a document', function(done) {
+        helper.login('drogba', 'abc123', function(body) {
+              request(app)
+                .post('/api/document/')
+                .send({
+                  ownerId: body.user._id,
+                  title: 'TIA',
+                  category: 'Lifestyle',
+                  content: 'Keeping up with being TIA',
+                  createdAt: new Date()
+                })
+                .set('Accept', 'application/json')
+                .set('x-access-token', body.token)
+                .end(function(err, rs) {
+                  expect(err).toBeNull();
+                  expect(rs.status).toEqual(403);
+                  expect(rs.body.error).toBeDefined();
+                  expect(rs.body.error).toBe('You are not authorised to create document');
+                  done();
+                });
+        });
+      });
+
       it('16. Doc created has a published date', function(done) {
         request(app)
           .post('/api/document')
@@ -39,6 +62,7 @@
           .end(function(err, res) {
             expect(err).toBeNull();
             expect(res.body).toBeDefined();
+            expect(res.status).toEqual(201);
             expect(res.body.message).toBe('Document created successfuly');
             expect(res.body.doc).toBeDefined();
             expect(res.body.doc.createdAt).toBeDefined();
@@ -53,6 +77,7 @@
           .set('x-access-token', token)
           .end(function(err, res) {
             expect(err).toBeNull();
+            expect(res.status).toEqual(200);
             expect(res.body).toBeDefined();
             expect(Array.isArray(res.body)).toBe(true);
             expect(res.body.length).toBeGreaterThan(0);
@@ -63,11 +88,12 @@
 
       it('18. returns docs in order of their date', function(done) {
         request(app)
-          .get('/api/documentbydate/?from=10-10-2015&to=10-10-2016')
+          .get('/api/document/date/?from=10-10-2015&to=10-10-2016')
           .set('Accept', 'application/json')
           .set('x-access-token', token)
           .end(function(err, res) {
             expect(res.body).toBeDefined();
+            expect(res.status).toEqual(200);
             expect(res.body[0].createdAt).toBeDefined();
             done();
           });
@@ -75,13 +101,14 @@
     });
 
     describe('19. Search', function() {
-      it('20. getAllDocumentsByRole', function(done) {
+      it('Fetch all documents based on user role', function(done) {
         request(app)
-          .get('/api/documentbyrole')
+          .get('/api/role/document')
           .set('Accept', 'application/json')
           .set('x-access-token', token)
           .end(function(err, res) {
             expect(err).toBeNull();
+            expect(res.status).toEqual(200);
             expect(res.body).toBeDefined();
             expect(Array.isArray(res.body)).toBe(true);
             expect(res.body.length).toEqual(4);
@@ -89,29 +116,31 @@
           });
       });
 
-      it('21. getAllDocumentsByDate', function(done) {
+      it('Gets all documents published between the specified dates', function(done) {
         request(app)
-          .get('/api/documentbydate/?from=10-10-2015&to=10-10-2016')
+          .get('/api/document/date/?from=10-10-2015&to=10-10-2016')
           .set('Accept', 'application/json')
           .set('x-access-token', token)
           .end(function(err, res) {
             expect(err).toBeNull();
             expect(res.body).toBeDefined();
+            expect(res.status).toEqual(200);
             expect(res.body[0].createdAt).toBeDefined();
             done();
           });
       });
 
-      it('20. getAllDocumentsByRole', function(done) {
+      it('Gets viewer\'s documents', function(done) {
         helper.login('drogba', 'abc123', function(body) {
           expect(body.token).toBeDefined();
           request(app)
-            .get('/api/documentbyrole')
+            .get('/api/role/document')
             .set('Accept', 'application/json')
             .set('x-access-token', body.token)
             .end(function(err, res) {
               expect(err).toBeNull();
               expect(res.body).toBeDefined();
+              expect(res.status).toEqual(200);
               expect(Array.isArray(res.body)).toEqual(true);
               expect(res.body.length).toEqual(2);
               done();
@@ -119,14 +148,15 @@
         });
       });
 
-      it('21. returns documents by category', function(done) {
+      it('returns documents by category', function(done) {
         request(app)
-          .get('/api/documentbycategory/?category=music')
+          .get('/api/document/category/?category=music')
           .set('Accept', 'application/json')
           .set('x-access-token', token)
           .end(function(err, res) {
             expect(err).toBeNull();
             expect(res.body).toBeDefined();
+            expect(res.status).toEqual(200);
             expect(res.body.length).toEqual(5);
             expect(typeof res.body[0]).toBe('object');
             done();
@@ -150,6 +180,7 @@
                 .set('x-access-token', body.token)
                 .end(function(err, rs) {
                   expect(err).toBeNull();
+                  expect(rs.status).toEqual(403);
                   expect(rs.body.message).toBeDefined();
                   expect(rs.body.message).toBe('You are not allowed to edit this doc');
                   done();

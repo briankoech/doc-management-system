@@ -52,7 +52,7 @@
         .end(function(err, res) {
           expect(err).toBeNull();
           expect(res.body.error).toBeDefined();
-          expect(res.status).toEqual(500);
+          expect(res.status).toEqual(409);
           expect(res.body.error.errmsg).toContain('duplicate key error');
           done();
         });
@@ -118,5 +118,25 @@
         });
     });
 
+    it('User can edit his/her profile', function(done) {
+      helper.login('martial', 'abc123', function(body) {
+        request(app)
+          .put('/api/users/' + body.user._id)
+          .send({
+            firstname: 'Martin',
+            lastname: 'Martinez',
+            email: 'mart@nez.tia'
+          })
+          .set('Accept', 'application/json')
+          .set('x-access-token', body.token)
+          .end(function(err, res) {
+            expect(err).toBeNull();
+            expect(res.status).toEqual(200);
+            expect(res.body.message).toBeDefined();
+            expect(res.body.message).toBe('update successful');
+            done();
+          });
+      });
+    });
   });
 })();
