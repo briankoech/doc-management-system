@@ -99,7 +99,6 @@
                   error: err
                 });
               } else if (result) {
-                //console.log('THISHISHISH', result);
                 //result.password = null;
                 var token = createToken(result);
                 res.status(200).send({
@@ -141,7 +140,7 @@
           } else {
             // check if loggedIn is true
             req.decoded = decoded;
-            User.findById(req.decoded._id, function(err, user) {
+            User.findById(req.decoded._doc._id, function(err, user) {
               if (err) {
                 res.status(401).send(errormsg);
               } else {
@@ -187,7 +186,7 @@
 
     update: function(req, res) {
       // check if user is admin | self
-      Role.findById(req.decoded.role, function(err, role) {
+      Role.findById(req.decoded._doc.role, function(err, role) {
         if (err) {
           res.status(500).send({
             error: err
@@ -203,7 +202,7 @@
                 message: 'no such user'
               });
             } else {
-              if (role.title === 'admin' || req.decoded._id.toString() === user._id.toString()) {
+              if (role.title === 'admin' || req.decoded._doc._id.toString() === user._id.toString()) {
                 //user.password = null;
                 req.user = user;
                 req.user.name.first = req.body.firstname;
@@ -238,7 +237,7 @@
 
     delete: function(req, res) {
       // check if user is admin | self
-      Role.findById(req.decoded.role, function(err, role) {
+      Role.findById(req.decoded._doc.role, function(err, role) {
         if (err) {
           res.status(500).send({
             error: err
@@ -254,7 +253,7 @@
                 message: 'no such user'
               });
             } else {
-              if (role.title === 'admin' || req.decoded.id === user._id) {
+              if (role.title === 'admin' || req.decoded._doc.id === user._id) {
                 User.remove({
                   _id: req.params.userId
                 }, function(err) {
@@ -263,7 +262,7 @@
                       error: err
                     });
                   } else {
-                    if (req.decoded.id === user._id) {
+                    if (req.decoded._doc.id === user._id) {
                       this.logout;
                     } else {
                       res.status(200).send({
@@ -289,7 +288,7 @@
       req.headers['x-access-token'] = null;
 
       User.findOneAndUpdate({
-        _id: req.decoded._id
+        _id: req.decoded._doc._id
       }, {
         $set: {
           loggedIn: false

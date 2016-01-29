@@ -10,7 +10,7 @@
     create: function(req, res) {
       var docsave = function(categoryId) {
         var document = new Document({
-          ownerId: req.decoded._id,
+          ownerId: req.decoded._doc._id,
           accessLevel: req.body.accessLevel,
           title: req.body.title,
           category: categoryId,
@@ -32,7 +32,7 @@
         });
       };
       // get userid from the token
-      Role.findById(req.decoded.role, function(err, role) {
+      Role.findById(req.decoded._doc.role, function(err, role) {
         if (err) {
           res.status(500).send({
             error: err
@@ -40,7 +40,7 @@
         } else if (!role) {
           res.status(404).send({
             error: 'no such role found',
-            role: req.decoded.role
+            role: req.decoded._doc.role
           });
         } else {
           if (role.title === 'viewer') {
@@ -102,7 +102,7 @@
     },
 
     getAllDocumentsByRole: function(req, res) {
-      Role.findById(req.decoded.role, function(err, role) {
+      Role.findById(req.decoded._doc.role, function(err, role) {
         if (err) {
           res.status(500).send({
             error: err
@@ -208,14 +208,14 @@
           });
         } else {
           // get the user role
-          Role.findById(req.decoded.role, function(err, role) {
+          Role.findById(req.decoded._doc.role, function(err, role) {
             if (err) {
               res.status(500).send({
                 error: err
               });
             } else {
               // check the role
-              if (doc.ownerId === req.decoded._id || role.title === 'admin') {
+              if (doc.ownerId === req.decoded._doc._id || role.title === 'admin') {
                 // can add contributors to doc
                 User.findById(req.body.contributor, function(err, user) {
                   if (err) {
@@ -275,7 +275,7 @@
 
     update: function(req, res) {
       // update if you are admin, owner or contributor
-      Role.findById(req.decoded.role, function(err, role) {
+      Role.findById(req.decoded._doc.role, function(err, role) {
         if (err) {
           res.status(500).send({
             error: err
@@ -287,7 +287,7 @@
                 error: err
               });
             } else {
-              if (role.title === 'admin' || req.decoded._id === doc.ownerId || doc.contributors.indexOf(req.decoded._id) >= 0) {
+              if (role.title === 'admin' || req.decoded._doc._id === doc.ownerId || doc.contributors.indexOf(req.decoded._doc._id) >= 0) {
                 req.document = doc;
                 doc.title = req.body.title;
                 doc.content = req.body.content;
@@ -310,7 +310,7 @@
     getAllById: function(req, res) {
       // get the user id
       Document.find({
-        ownerId: req.decoded.id
+        ownerId: req.decoded._doc._id
       }, function(err, documents) {
         if (err) {
           return res.status(500).send(err);
@@ -326,7 +326,7 @@
 
     delete: function(req, res) {
       // delete if you are the owner or admin
-      Role.findById(req.decoded.role, function(err, role) {
+      Role.findById(req.decoded._doc.role, function(err, role) {
         if (err) {
           res.status(500).send({
             error: err
@@ -338,7 +338,7 @@
                 error: err
               });
             } else if (doc) {
-              if (role.title === 'admin' || req.decoded._id.toString() === doc.ownerId.toString()) {
+              if (role.title === 'admin' || req.decoded._doc._id.toString() === doc.ownerId.toString()) {
                 Document.remove({
                   _id: req.params._id
                 }, function(err) {

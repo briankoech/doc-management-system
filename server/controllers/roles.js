@@ -25,7 +25,7 @@
 
     getRole: function(req) {
       // get the roleId from req.decoded
-      Roles.findById(req.decoded.role, function(err, role) {
+      Roles.findById(req.decoded._doc.role, function(err, role) {
         if (err) {
           return 'error';
         } else if (role) {
@@ -37,7 +37,7 @@
     },
 
     checkUserRole: function(req, res, next) {
-      Roles.findById(req.decoded.role, function(err, role) {
+      Roles.findById(req.decoded._doc.role, function(err, role) {
         if (err) {
           res.status(500).send({
             error: err
