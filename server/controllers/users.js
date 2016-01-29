@@ -140,7 +140,6 @@
           } else {
             // check if loggedIn is true
             req.decoded = decoded;
-            console.log(req.decoded);
             User.findById(req.decoded._doc._id, function(err, user) {
               if (err) {
                 res.status(401).send(errormsg);
