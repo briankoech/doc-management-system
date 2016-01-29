@@ -43,7 +43,7 @@
           expect(err).toBeNull();
           expect(res.status).toEqual(409);
           expect(res.body).toBeDefined();
-          expect(res.body.error).toContain('E11000 duplicate key error index: test.categories.$category_1 dup key: { : "music" }');
+          expect(res.body.error).toContain('duplicate key error');
           done();
         });
     });

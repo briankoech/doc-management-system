@@ -28,7 +28,7 @@
           expect(err).toBeNull();
           expect(res.status).toEqual(409);
           expect(res.body).toBeDefined();
-          expect(res.body.error).toBe('E11000 duplicate key error index: test.roles.$title_1 dup key: { : "viewer" }');
+          expect(res.body.error).toContain('duplicate key error');
           done();
         });
     });
